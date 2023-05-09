@@ -16,6 +16,7 @@ from .document import (
     DocumentLMEmbeddings,
     DocumentPoolEmbeddings,
     DocumentRNNEmbeddings,
+    DocumentStaticEmbeddings,
     DocumentTFIDFEmbeddings,
     SentenceTransformerDocumentEmbeddings,
     TransformerDocumentEmbeddings,
