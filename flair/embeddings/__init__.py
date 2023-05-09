@@ -73,6 +73,7 @@ __all__ = [
     "DocumentEmbeddings",
     "DocumentLMEmbeddings",
     "DocumentPoolEmbeddings",
+    "DocumentStaticEmbeddings",
     "DocumentRNNEmbeddings",
     "DocumentTFIDFEmbeddings",
     "SentenceTransformerDocumentEmbeddings",
