@@ -243,7 +243,7 @@ class DocumentStaticEmbeddings(DocumentEmbeddings):
 
         self.to(flair.device)
 
-        self.name: str = "document_tfidf"
+        self.name: str = "document_static"
         self.eval()
 
     @property
@@ -255,9 +255,6 @@ class DocumentStaticEmbeddings(DocumentEmbeddings):
         # if only one sentence is passed, convert to list of sentence
         if isinstance(sentences, Sentence):
             sentences = [sentences]
-
-        raw_sentences = [s.to_original_text() for s in sentences]
-        tfidf_vectors = 
 
         for sentence_id, sentence in enumerate(sentences):
             sentence.set_embedding(self.name, torch.from_numpy(np.array(sentence.to_original_text().split(','),int)))
