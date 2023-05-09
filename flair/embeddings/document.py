@@ -258,7 +258,7 @@ class DocumentStaticEmbeddings(DocumentEmbeddings):
         import numpy as np
 
         for sentence_id, sentence in enumerate(sentences):
-            sentence.set_embedding(self.name, torch.from_numpy(np.array(sentence.to_original_text().split(','),int)))
+            sentence.set_embedding(self.name, torch.from_numpy(np.array(sentence.to_original_text().split(','),np.single)))
 
     def _add_embeddings_internal(self, sentences: List[Sentence]):
         pass
