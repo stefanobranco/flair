@@ -225,6 +225,56 @@ class DocumentTFIDFEmbeddings(DocumentEmbeddings):
 
 
 @register_embeddings
+class DocumentStaticEmbeddings(DocumentEmbeddings):
+    def __init__(
+        self,
+        train_dataset: List[Sentence],
+        length: int = 1536,
+        **vectorizer_params,
+    ) -> None:
+        """The constructor for DocumentTFIDFEmbeddings.
+
+        :param train_dataset: the train dataset which will be used to construct a vectorizer
+        :param vectorizer_params: parameters given to Scikit-learn's TfidfVectorizer constructor
+        """
+        super().__init__()
+
+        self.__embedding_length: int = len(self.vectorizer.vocabulary_)
+
+        self.to(flair.device)
+
+        self.name: str = "document_tfidf"
+        self.eval()
+
+    @property
+    def embedding_length(self) -> int:
+        return self.__embedding_length
+
+    def embed(self, sentences: Union[List[Sentence], Sentence]):
+        """Add embeddings to every sentence in the given list of sentences."""
+        # if only one sentence is passed, convert to list of sentence
+        if isinstance(sentences, Sentence):
+            sentences = [sentences]
+
+        raw_sentences = [s.to_original_text() for s in sentences]
+        tfidf_vectors = 
+
+        for sentence_id, sentence in enumerate(sentences):
+            sentence.set_embedding(self.name, torch.from_numpy(np.array(sentence.to_original_text().split(','),int)))
+
+    def _add_embeddings_internal(self, sentences: List[Sentence]):
+        pass
+
+    @classmethod
+    def from_params(cls, params: Dict[str, Any]) -> "DocumentStaticEmbeddings":
+        return cls(train_dataset=[], length=params["length"])
+
+    def to_params(self) -> Dict[str, Any]:
+        return {
+            "length": self.__embedding_length,
+        }
+
+@register_embeddings
 class DocumentRNNEmbeddings(DocumentEmbeddings):
     def __init__(
         self,
