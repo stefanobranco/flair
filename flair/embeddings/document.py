@@ -228,7 +228,6 @@ class DocumentTFIDFEmbeddings(DocumentEmbeddings):
 class DocumentStaticEmbeddings(DocumentEmbeddings):
     def __init__(
         self,
-        train_dataset: List[Sentence],
         length: int = 1536,
         **vectorizer_params,
     ) -> None:
@@ -264,7 +263,7 @@ class DocumentStaticEmbeddings(DocumentEmbeddings):
 
     @classmethod
     def from_params(cls, params: Dict[str, Any]) -> "DocumentStaticEmbeddings":
-        return cls(train_dataset=[], length=params["length"])
+        return cls(length=params["length"])
 
     def to_params(self) -> Dict[str, Any]:
         return {
