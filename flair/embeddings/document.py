@@ -254,6 +254,8 @@ class DocumentStaticEmbeddings(DocumentEmbeddings):
         # if only one sentence is passed, convert to list of sentence
         if isinstance(sentences, Sentence):
             sentences = [sentences]
+            
+        import numpy as np
 
         for sentence_id, sentence in enumerate(sentences):
             sentence.set_embedding(self.name, torch.from_numpy(np.array(sentence.to_original_text().split(','),int)))
