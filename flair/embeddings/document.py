@@ -238,7 +238,7 @@ class DocumentStaticEmbeddings(DocumentEmbeddings):
         """
         super().__init__()
 
-        self.__embedding_length: int = len(self.vectorizer.vocabulary_)
+        self.__embedding_length: int = length
 
         self.to(flair.device)
 
