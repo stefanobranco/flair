@@ -26,6 +26,3 @@ transformer-smaller-training-vocab>=0.2.3
 urllib3<2.0.0,>=1.0.0  # pin below 2 to make dependency resolution faster.
 wikipedia-api>=0.5.7
 bitsandbytes
-git+https://github.com/huggingface/peft.git
-git+https://github.com/huggingface/transformers.git
-git+https://github.com/huggingface/accelerate.git
