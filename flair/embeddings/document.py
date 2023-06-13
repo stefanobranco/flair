@@ -5,6 +5,7 @@ import torch
 from sklearn.feature_extraction.text import TfidfVectorizer
 from torch.nn import RNNBase
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
+from transformers import BitsAndBytesConfig
 
 import flair
 from flair.data import Sentence
@@ -33,6 +34,7 @@ class TransformerDocumentEmbeddings(DocumentEmbeddings, TransformerEmbeddings):
         layers: str = "-1",
         layer_mean: bool = False,
         is_token_embedding: bool = False,
+        quantization_config: BitsAndBytesConfig = None,
         **kwargs,
     ) -> None:
         """Bidirectional transformer embeddings of words from various transformer architectures.
@@ -51,6 +53,7 @@ class TransformerDocumentEmbeddings(DocumentEmbeddings, TransformerEmbeddings):
             layer_mean=layer_mean,
             is_token_embedding=is_token_embedding,
             is_document_embedding=True,
+            quantization_config=quantization_config,
             **kwargs,
         )
 

@@ -27,6 +27,7 @@ from transformers import (
 )
 from transformers.tokenization_utils_base import LARGE_INTEGER
 from transformers.utils import PaddingStrategy
+from transformers import BitsAndBytesConfig
 
 import flair
 from flair.data import Sentence, Token, log
@@ -968,6 +969,7 @@ class TransformerEmbeddings(TransformerBaseEmbeddings):
         force_max_length: bool = False,
         needs_manual_ocr: Optional[bool] = None,
         use_context_separator: bool = True,
+        quantization_config: BitsAndBytesConfig = None,
         **kwargs,
     ) -> None:
         self.instance_parameters = self.get_instance_parameters(locals=locals())
@@ -1010,16 +1012,16 @@ class TransformerEmbeddings(TransformerBaseEmbeddings):
             if is_supported_t5_model(config):
                 from transformers import T5EncoderModel
 
-                transformer_model = T5EncoderModel.from_pretrained(model, config=config)
+                transformer_model = T5EncoderModel.from_pretrained(model, config=config, quantization_config=quantization_config)
             else:
-                transformer_model = AutoModel.from_pretrained(model, config=config)
+                transformer_model = AutoModel.from_pretrained(model, config=config, quantization_config=quantization_config)
         else:
             if is_supported_t5_model(saved_config):
                 from transformers import T5EncoderModel
 
-                transformer_model = T5EncoderModel(saved_config, **kwargs)
+                transformer_model = T5EncoderModel(saved_config, quantization_config=quantization_config, **kwargs)
             else:
-                transformer_model = AutoModel.from_config(saved_config, **kwargs)
+                transformer_model = AutoModel.from_config(saved_config, quantization_config=quantization_config, **kwargs)
         transformer_model = transformer_model.to(flair.device)
 
         self.truncate = True
