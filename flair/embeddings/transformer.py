@@ -1012,17 +1012,17 @@ class TransformerEmbeddings(TransformerBaseEmbeddings):
             if is_supported_t5_model(config):
                 from transformers import T5EncoderModel
 
-                transformer_model = T5EncoderModel.from_pretrained(model, config=config, quantization_config=quantization_config)
+                transformer_model = T5EncoderModel.from_pretrained(model, config=config, quantization_config=quantization_config, device_map=flair.device)
             else:
-                transformer_model = AutoModel.from_pretrained(model, config=config, quantization_config=quantization_config)
+                transformer_model = AutoModel.from_pretrained(model, config=config, quantization_config=quantization_config, device_map=flair.device)
         else:
             if is_supported_t5_model(saved_config):
                 from transformers import T5EncoderModel
 
-                transformer_model = T5EncoderModel(saved_config, quantization_config=quantization_config, **kwargs)
+                transformer_model = T5EncoderModel(saved_config, quantization_config=quantization_config, device_map=flair.device, **kwargs)
             else:
-                transformer_model = AutoModel.from_config(saved_config, quantization_config=quantization_config, **kwargs)
-        transformer_model = transformer_model.to(flair.device)
+                transformer_model = AutoModel.from_config(saved_config, quantization_config=quantization_config, device_map=flair.device, **kwargs)
+        # transformer_model = transformer_model.to(flair.device)
 
         self.truncate = True
         self.force_max_length = force_max_length
