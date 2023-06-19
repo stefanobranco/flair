@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 import torch.nn
-import bnb.nn
+import bitsandbytes as bnb
 from torch.nn.modules.loss import _Loss
 from torch.utils.data.dataset import Dataset
 from tqdm import tqdm
