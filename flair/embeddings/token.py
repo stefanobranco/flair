@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional, Union
 import gensim
 import numpy as np
 import torch
-import bnb
+import bitsandbytes as bnb
 from bpemb import BPEmb
 from gensim.models import KeyedVectors
 from gensim.models.fasttext import FastTextKeyedVectors, load_facebook_vectors
