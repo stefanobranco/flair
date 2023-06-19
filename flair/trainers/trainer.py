@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import List, Optional, Tuple, Type, Union
 
 import torch
+import bnb
 from torch.optim.sgd import SGD
 from torch.utils.data.dataset import ConcatDataset
 
@@ -205,7 +206,7 @@ class ModelTrainer(Pluggable):
         eval_batch_size: int = 16,
         mini_batch_chunk_size: Optional[int] = None,
         max_epochs: int = 10,
-        optimizer: Type[torch.optim.Optimizer] = torch.optim.AdamW,
+        optimizer: Type[bnb.optim.Optimizer] = bnb.optim.Adam8bit,
         train_with_dev: bool = False,
         train_with_test: bool = False,
         # evaluation and monitoring
