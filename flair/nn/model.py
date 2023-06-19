@@ -576,7 +576,7 @@ class DefaultClassifier(Classifier[DT], typing.Generic[DT, DT2], ABC):
             self.decoder = decoder
             self._custom_decoder = True
         else:
-            self.decoder = bnb.nn.Linear(final_embedding_size, len(self.label_dictionary))
+            self.decoder = bnb.nn.Linear8bitLt(final_embedding_size, len(self.label_dictionary))
             torch.nn.init.xavier_uniform_(self.decoder.weight)
             self._custom_decoder = False
 
