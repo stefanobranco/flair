@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 import torch.nn
+import bnb.nn
 from torch.nn.modules.loss import _Loss
 from torch.utils.data.dataset import Dataset
 from tqdm import tqdm
@@ -575,7 +576,7 @@ class DefaultClassifier(Classifier[DT], typing.Generic[DT, DT2], ABC):
             self.decoder = decoder
             self._custom_decoder = True
         else:
-            self.decoder = torch.nn.Linear(final_embedding_size, len(self.label_dictionary))
+            self.decoder = bnb.nn.Linear(final_embedding_size, len(self.label_dictionary))
             torch.nn.init.xavier_uniform_(self.decoder.weight)
             self._custom_decoder = False
 
