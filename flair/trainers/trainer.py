@@ -134,7 +134,7 @@ class ModelTrainer(Pluggable):
         eval_batch_size: int = 64,
         mini_batch_chunk_size: Optional[int] = None,
         max_epochs: int = 100,
-        optimizer: Type[torch.optim.Optimizer] = torch.optim.SGD,
+        optimizer: Type[torch.optim.Optimizer] = bnb.optim.SGD8bit,
         train_with_dev: bool = False,
         train_with_test: bool = False,
         # evaluation and monitoring
@@ -206,7 +206,7 @@ class ModelTrainer(Pluggable):
         eval_batch_size: int = 16,
         mini_batch_chunk_size: Optional[int] = None,
         max_epochs: int = 10,
-        optimizer: Type[bnb.optim.Optimizer] = bnb.optim.Adam8bit,
+        optimizer: Type[torch.optim.Optimizer] = bnb.optim.AdamW8bit,
         train_with_dev: bool = False,
         train_with_test: bool = False,
         # evaluation and monitoring
