@@ -10,6 +10,7 @@ from typing import Any, Dict, List, Optional, Union
 import gensim
 import numpy as np
 import torch
+import bnb
 from bpemb import BPEmb
 from gensim.models import KeyedVectors
 from gensim.models.fasttext import FastTextKeyedVectors, load_facebook_vectors
@@ -218,7 +219,7 @@ class WordEmbeddings(TokenEmbeddings):
             self.__embedding_length = embedding_length
             vectors = np.zeros((len(self.vocab) + 1, self.__embedding_length), dtype="float")
 
-        self.embedding = nn.Embedding.from_pretrained(torch.FloatTensor(vectors), freeze=not fine_tune)
+        self.embedding = bnb.nn.Embedding.from_pretrained(torch.FloatTensor(vectors), freeze=not fine_tune)
 
         if stable:
             self.layer_norm: Optional[nn.LayerNorm] = nn.LayerNorm(
@@ -398,7 +399,7 @@ class WordEmbeddings(TokenEmbeddings):
                     np.zeros(precomputed_word_embeddings.vector_size, dtype="float"),
                 )
             )
-            embedding = nn.Embedding.from_pretrained(torch.FloatTensor(vectors), freeze=not state["fine_tune"])
+            embedding =  bnb.nn.Embedding.from_pretrained(torch.FloatTensor(vectors), freeze=not state["fine_tune"])
 
             try:
                 # gensim version 4
@@ -467,7 +468,7 @@ class CharacterEmbeddings(TokenEmbeddings):
 
         self.char_embedding_dim: int = char_embedding_dim
         self.hidden_size_char: int = hidden_size_char
-        self.char_embedding = torch.nn.Embedding(len(self.char_dictionary.item2idx), self.char_embedding_dim)
+        self.char_embedding = bnb.nn.Embedding(len(self.char_dictionary.item2idx), self.char_embedding_dim)
         self.char_rnn = torch.nn.LSTM(
             self.char_embedding_dim,
             self.hidden_size_char,
@@ -1120,7 +1121,7 @@ class OneHotEmbeddings(TokenEmbeddings):
         log.info(f"vocabulary size of {len(self.vocab_dictionary)}")
 
         # model architecture
-        self.embedding_layer = nn.Embedding(len(self.vocab_dictionary), self.__embedding_length)
+        self.embedding_layer = bnb.nn.Embedding(len(self.vocab_dictionary), self.__embedding_length)
         nn.init.xavier_uniform_(self.embedding_layer.weight)
         if stable:
             self.layer_norm: Optional[nn.LayerNorm] = nn.LayerNorm(embedding_length)
@@ -1208,7 +1209,7 @@ class HashEmbeddings(TokenEmbeddings):
         self.__hash_method = hash_method
 
         # model architecture
-        self.embedding_layer = torch.nn.Embedding(self.__num_embeddings, self.__embedding_length)
+        self.embedding_layer = bnb.nn.Embedding(self.__num_embeddings, self.__embedding_length)
         torch.nn.init.xavier_uniform_(self.embedding_layer.weight)
 
         self.to(flair.device)
