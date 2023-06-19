@@ -2,7 +2,7 @@ import logging
 from typing import Any, Dict, List, Optional, Union, cast
 
 import torch
-import bnb
+import bitsandbytes as bnb
 from sklearn.feature_extraction.text import TfidfVectorizer
 from torch.nn import RNNBase
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
