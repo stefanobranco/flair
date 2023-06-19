@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import List, Optional, Tuple, Type, Union
 
 import torch
-import bnb
+import bitsandbytes as bnb
 from torch.optim.sgd import SGD
 from torch.utils.data.dataset import ConcatDataset
 
