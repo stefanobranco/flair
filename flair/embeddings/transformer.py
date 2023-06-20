@@ -969,7 +969,6 @@ class TransformerEmbeddings(TransformerBaseEmbeddings):
         force_max_length: bool = False,
         needs_manual_ocr: Optional[bool] = None,
         use_context_separator: bool = True,
-        quantization_config: BitsAndBytesConfig = None,
         **kwargs,
     ) -> None:
         self.instance_parameters = self.get_instance_parameters(locals=locals())
@@ -1012,14 +1011,14 @@ class TransformerEmbeddings(TransformerBaseEmbeddings):
             if is_supported_t5_model(config):
                 from transformers import T5EncoderModel
 
-                transformer_model = T5EncoderModel.from_pretrained(model, config=config, quantization_config=quantization_config, device_map=flair.device)
+                transformer_model = T5EncoderModel.from_pretrained(model, config=config, load_in_8bit=True, device_map=flair.device)
             else:
-                transformer_model = AutoModel.from_pretrained(model, config=config, quantization_config=quantization_config, device_map=flair.device)
+                transformer_model = AutoModel.from_pretrained(model, config=config, load_in_8bit=True, device_map=flair.device)
         else:
             if is_supported_t5_model(saved_config):
                 from transformers import T5EncoderModel
 
-                transformer_model = T5EncoderModel(saved_config, quantization_config=quantization_config, device_map=flair.device, **kwargs)
+                transformer_model = T5EncoderModel(saved_config, load_in_8bit=True, device_map=flair.device, **kwargs)
             else:
                 transformer_model = AutoModel.from_config(saved_config, **kwargs)
         # transformer_model = transformer_model.to(flair.device)
