@@ -90,12 +90,12 @@ class DocumentPoolEmbeddings(DocumentEmbeddings):
         # optional fine-tuning on top of embedding layer
         self.fine_tune_mode = fine_tune_mode
         if self.fine_tune_mode in ["nonlinear", "linear"]:
-            self.embedding_flex = bnb.nn.Linear8bitLt(self.embedding_length, self.embedding_length, bias=False)
+            self.embedding_flex = bnb.nn.Linear8bitLt(self.embedding_length, self.embedding_length, bias=False, threshold=6.0)
             self.embedding_flex.weight.data.copy_(torch.eye(self.embedding_length))
 
         if self.fine_tune_mode in ["nonlinear"]:
             self.embedding_flex_nonlinear = torch.nn.ReLU()
-            self.embedding_flex_nonlinear_map = bnb.nn.Linear8bitLt(self.embedding_length, self.embedding_length)
+            self.embedding_flex_nonlinear_map = bnb.nn.Linear8bitLt(self.embedding_length, self.embedding_length, threshold=6.0)
 
         self.__embedding_length = self.embeddings.embedding_length
 
