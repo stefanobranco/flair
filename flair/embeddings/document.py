@@ -93,12 +93,12 @@ class DocumentPoolEmbeddings(DocumentEmbeddings):
         # optional fine-tuning on top of embedding layer
         self.fine_tune_mode = fine_tune_mode
         if self.fine_tune_mode in ["nonlinear", "linear"]:
-            self.embedding_flex = bnb.nn.Linear(self.embedding_length, self.embedding_length, bias=False)
+            self.embedding_flex = bnb.nn.Linear8bitLt(self.embedding_length, self.embedding_length, bias=False)
             self.embedding_flex.weight.data.copy_(torch.eye(self.embedding_length))
 
         if self.fine_tune_mode in ["nonlinear"]:
             self.embedding_flex_nonlinear = torch.nn.ReLU()
-            self.embedding_flex_nonlinear_map = bnb.nn.Linear(self.embedding_length, self.embedding_length)
+            self.embedding_flex_nonlinear_map = bnb.nn.Linear8bitLt(self.embedding_length, self.embedding_length)
 
         self.__embedding_length = self.embeddings.embedding_length
 
@@ -280,7 +280,7 @@ class DocumentRNNEmbeddings(DocumentEmbeddings):
         if self.reproject_words and reproject_words_dimension is not None:
             self.embeddings_dimension = reproject_words_dimension
 
-        self.word_reprojection_map = bnb.nn.Linear(self.length_of_all_token_embeddings, self.embeddings_dimension)
+        self.word_reprojection_map = bnb.nn.Linear8bitLt(self.length_of_all_token_embeddings, self.embeddings_dimension)
 
         # bidirectional RNN on top of embedding layer
         if rnn_type == "LSTM":
@@ -642,7 +642,7 @@ class DocumentCNNEmbeddings(DocumentEmbeddings):
             self.embeddings_dimension = reproject_words_dimension
 
         if self.reproject_words:
-            self.word_reprojection_map: Optional[bnb.nn.Linear] = bnb.nn.Linear(
+            self.word_reprojection_map: Optional[bnb.nn.Linear8bitLt] = bnb.nn.Linear8bitLt(
                 self.length_of_all_token_embeddings, self.embeddings_dimension
             )
             torch.nn.init.xavier_uniform_(self.word_reprojection_map.weight)
