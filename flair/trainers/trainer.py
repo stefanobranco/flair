@@ -233,6 +233,11 @@ class ModelTrainer(Pluggable):
         create_file_logs: bool = True,
         create_loss_file: bool = True,
         write_weights: bool = False,
+        accelerator: str = "auto",
+        strategy: str = "auto",
+        devices: Union[List[int], str, int] = "auto",
+        num_nodes: int = 1,
+        precision: Union[str, int] = 32,
         # plugins
         plugins: Optional[List[TrainerPlugin]] = None,
         attach_default_scheduler: bool = True,
@@ -258,8 +263,9 @@ class ModelTrainer(Pluggable):
                                  embeddings_storage_mode=embeddings_storage_mode, epoch=epoch,
                                  save_final_model=save_final_model, save_optimizer_state=save_optimizer_state,
                                  save_model_each_k_epochs=save_model_each_k_epochs, create_file_logs=create_file_logs,
-                                 create_loss_file=create_loss_file, write_weights=write_weights, plugins=plugins,
-                                 **kwargs)
+                                 create_loss_file=create_loss_file, write_weights=write_weights, accelerator=accelerator,
+                                 strategy=strategy, devices=devices, num_nodes=num_nodes, precision=precision,
+                                 plugins=plugins, **kwargs)
 
     def train_custom(
         self,
