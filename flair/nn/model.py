@@ -173,7 +173,6 @@ class Model(torch.nn.Module, typing.Generic[DT], ABC):
                 model.model_card = state["model_card"]
 
             model.eval()
-            model.to(flair.device)
 
         return model
 
@@ -600,7 +599,7 @@ class DefaultClassifier(Classifier[DT], typing.Generic[DT, DT2], ABC):
             for i, tag in enumerate(self.label_dictionary.get_items()):
                 if tag in loss_weights:
                     weight_list[i] = loss_weights[tag]
-            self.loss_weights: Optional[torch.Tensor] = torch.FloatTensor(weight_list).to(flair.device)
+            self.loss_weights: Optional[torch.Tensor] = torch.FloatTensor(weight_list)
         else:
             self.loss_weights = None
 

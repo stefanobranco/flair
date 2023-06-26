@@ -47,7 +47,6 @@ class TextClassifier(flair.nn.DefaultClassifier[Sentence, Sentence]):
         self._label_type = label_type
 
         # auto-spawn on GPU if available
-        self.to(flair.device)
 
     def _get_embedding_for_data_point(self, prediction_data_point: Sentence) -> torch.Tensor:
         embedding_names = self.embeddings.get_names()

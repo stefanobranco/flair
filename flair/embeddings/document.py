@@ -98,8 +98,6 @@ class DocumentPoolEmbeddings(DocumentEmbeddings):
 
         self.__embedding_length = self.embeddings.embedding_length
 
-        self.to(flair.device)
-
         if pooling not in ["min", "max", "mean"]:
             raise ValueError(f"Pooling operation for {self.mode!r} is not defined")
 
@@ -124,9 +122,7 @@ class DocumentPoolEmbeddings(DocumentEmbeddings):
         self.embeddings.embed(sentences)
 
         for sentence in sentences:
-            word_embeddings = torch.cat([token.get_embedding().unsqueeze(0) for token in sentence.tokens], dim=0).to(
-                flair.device
-            )
+            word_embeddings = torch.cat([token.get_embedding().unsqueeze(0) for token in sentence.tokens], dim=0)
 
             if self.fine_tune_mode in ["nonlinear", "linear"]:
                 word_embeddings = self.embedding_flex(word_embeddings)
@@ -189,8 +185,6 @@ class DocumentTFIDFEmbeddings(DocumentEmbeddings):
             self.vectorizer.fit([s.to_original_text() for s in train_dataset])
 
         self.__embedding_length: int = len(self.vectorizer.vocabulary_)
-
-        self.to(flair.device)
 
         self.name: str = "document_tfidf"
         self.eval()
@@ -304,8 +298,6 @@ class DocumentRNNEmbeddings(DocumentEmbeddings):
         self.word_dropout = WordDropout(word_dropout) if word_dropout > 0.0 else None
 
         torch.nn.init.xavier_uniform_(self.word_reprojection_map.weight)
-
-        self.to(flair.device)
 
         self.eval()
 
@@ -662,7 +654,6 @@ class DocumentCNNEmbeddings(DocumentEmbeddings):
         self.locked_dropout = LockedDropout(locked_dropout) if locked_dropout > 0.0 else None
         self.word_dropout = WordDropout(word_dropout) if word_dropout > 0.0 else None
 
-        self.to(flair.device)
         self.min_sequence_length = max(kernel_size for _, kernel_size in self.kernels)
         self.eval()
 

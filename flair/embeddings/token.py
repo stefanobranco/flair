@@ -228,7 +228,6 @@ class WordEmbeddings(TokenEmbeddings):
             self.layer_norm = None
 
         self.device = None
-        self.to(flair.device)
         self.eval()
 
     def resolve_precomputed_path(self, embeddings: Optional[str]) -> Optional[Path]:
@@ -344,9 +343,6 @@ class WordEmbeddings(TokenEmbeddings):
         if self.layer_norm is not None:
             embeddings = self.layer_norm(embeddings)
 
-        if self.force_cpu:
-            embeddings = embeddings.to(flair.device)
-
         for emb, token in zip(embeddings, tokens):
             token.set_embedding(self.name, emb)
 
@@ -365,15 +361,12 @@ class WordEmbeddings(TokenEmbeddings):
         if self.force_cpu:
             device = torch.device("cpu")
         self.device = device
-        super().to(device)
 
     def _apply(self, fn):
         if fn.__name__ == "convert" and self.force_cpu:
             # this is required to force the module on the cpu,
             # if a parent module is put to gpu, the _apply is called to each sub_module
             # self.to(..) actually sets the device properly
-            if not hasattr(self, "device"):
-                self.to(flair.device)
             return
         super()._apply(fn)
 
@@ -477,7 +470,6 @@ class CharacterEmbeddings(TokenEmbeddings):
 
         self.__embedding_length = self.hidden_size_char * 2
 
-        self.to(flair.device)
         self.eval()
 
     @property
@@ -1127,7 +1119,6 @@ class OneHotEmbeddings(TokenEmbeddings):
         else:
             self.layer_norm = None
 
-        self.to(flair.device)
         self.eval()
 
     @property
@@ -1142,7 +1133,7 @@ class OneHotEmbeddings(TokenEmbeddings):
         else:
             one_hot_sentences = [self.vocab_dictionary.get_idx_for_item(t.get_label(self.field).value) for t in tokens]
 
-        one_hot_sentences_tensor = torch.tensor(one_hot_sentences, dtype=torch.long).to(flair.device)
+        one_hot_sentences_tensor = torch.tensor(one_hot_sentences, dtype=torch.long)
 
         embedded = self.embedding_layer.forward(one_hot_sentences_tensor)
         if self.layer_norm is not None:
@@ -1211,7 +1202,6 @@ class HashEmbeddings(TokenEmbeddings):
         self.embedding_layer = torch.nn.Embedding(self.__num_embeddings, self.__embedding_length)
         torch.nn.init.xavier_uniform_(self.embedding_layer.weight)
 
-        self.to(flair.device)
         self.eval()
 
     @property
@@ -1230,7 +1220,7 @@ class HashEmbeddings(TokenEmbeddings):
 
         context_idxs = [get_idx_for_item(t.text) for sentence in sentences for t in sentence.tokens]
 
-        hash_sentences = torch.tensor(context_idxs, dtype=torch.long).to(flair.device)
+        hash_sentences = torch.tensor(context_idxs, dtype=torch.long)
 
         embedded = self.embedding_layer.forward(hash_sentences)
 
