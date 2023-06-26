@@ -8,6 +8,8 @@ from inspect import signature
 from pathlib import Path
 from typing import List, Optional, Tuple, Type, Union
 
+from lightning.fabric import Fabric
+
 import torch
 from torch.optim.sgd import SGD
 from torch.utils.data.dataset import ConcatDataset
@@ -58,6 +60,7 @@ class ModelTrainer(Pluggable):
         :param corpus: The dataset used to train the model, should be of type Corpus
         """
         super().__init__()
+
         self.model: flair.nn.Model = model
         self.corpus: Corpus = corpus
 
@@ -117,7 +120,7 @@ class ModelTrainer(Pluggable):
 
         This allows plugins to overwrite the backward call.
         """
-        loss.backward()
+        self.fabric.backward(loss)
 
     def train(
         self,
@@ -242,44 +245,21 @@ class ModelTrainer(Pluggable):
         if attach_default_scheduler:
             plugins.append(LinearSchedulerPlugin(warmup_fraction=warmup_fraction))
 
-        return self.train_custom(
-            base_path=base_path,
-            # training parameters
-            learning_rate=learning_rate,
-            decoder_learning_rate=decoder_learning_rate,
-            mini_batch_size=mini_batch_size,
-            eval_batch_size=eval_batch_size,
-            mini_batch_chunk_size=mini_batch_chunk_size,
-            max_epochs=max_epochs,
-            optimizer=optimizer,
-            train_with_dev=train_with_dev,
-            train_with_test=train_with_test,
-            # evaluation and monitoring
-            main_evaluation_metric=main_evaluation_metric,
-            monitor_test=monitor_test,
-            monitor_train_sample=monitor_train_sample,
-            use_final_model_for_eval=use_final_model_for_eval,
-            gold_label_dictionary_for_eval=gold_label_dictionary_for_eval,
-            exclude_labels=exclude_labels,
-            # sampling and shuffling
-            sampler=sampler,
-            shuffle=shuffle,
-            shuffle_first_epoch=shuffle_first_epoch,
-            # evaluation and monitoring
-            embeddings_storage_mode=embeddings_storage_mode,
-            epoch=epoch,
-            # when and what to save
-            save_final_model=save_final_model,
-            save_optimizer_state=save_optimizer_state,
-            save_model_each_k_epochs=save_model_each_k_epochs,
-            # logging parameters
-            create_file_logs=create_file_logs,
-            create_loss_file=create_loss_file,
-            write_weights=write_weights,
-            # plugins
-            plugins=plugins,
-            **kwargs,
-        )
+        return self.train_custom(base_path=base_path, learning_rate=learning_rate,
+                                 decoder_learning_rate=decoder_learning_rate, mini_batch_size=mini_batch_size,
+                                 eval_batch_size=eval_batch_size, mini_batch_chunk_size=mini_batch_chunk_size,
+                                 max_epochs=max_epochs, optimizer=optimizer, train_with_dev=train_with_dev,
+                                 train_with_test=train_with_test, main_evaluation_metric=main_evaluation_metric,
+                                 monitor_test=monitor_test, monitor_train_sample=monitor_train_sample,
+                                 use_final_model_for_eval=use_final_model_for_eval,
+                                 gold_label_dictionary_for_eval=gold_label_dictionary_for_eval,
+                                 exclude_labels=exclude_labels, sampler=sampler, shuffle=shuffle,
+                                 shuffle_first_epoch=shuffle_first_epoch,
+                                 embeddings_storage_mode=embeddings_storage_mode, epoch=epoch,
+                                 save_final_model=save_final_model, save_optimizer_state=save_optimizer_state,
+                                 save_model_each_k_epochs=save_model_each_k_epochs, create_file_logs=create_file_logs,
+                                 create_loss_file=create_loss_file, write_weights=write_weights, plugins=plugins,
+                                 **kwargs)
 
     def train_custom(
         self,
@@ -316,6 +296,11 @@ class ModelTrainer(Pluggable):
         create_file_logs: bool = True,
         create_loss_file: bool = True,
         write_weights: bool = False,
+        accelerator: str = "auto",
+        strategy: str = "auto",
+        devices: Union[List[int], str, int] = "auto",
+        num_nodes: int = 1,
+        precision: Union[str, int] = 32,
         # plugins
         plugins: List[TrainerPlugin] = [],
         **kwargs,
@@ -365,6 +350,15 @@ class ModelTrainer(Pluggable):
         dict: A dictionary with at least the key "test_score" containing the final evaluation score. Some plugins
                 add additional information to this dictionary, such as the :class:`MetricHistoryPlugin`
         """
+
+        # setup Fabric
+        self.fabric = Fabric(accelerator=accelerator,
+                             devices=devices,
+                             precision=precision,
+                             num_nodes=num_nodes,
+                             strategy=strategy)
+        self.fabric.launch()
+        flair.device = self.fabric.device
         # Create output folder
         base_path = Path(base_path)
         base_path.mkdir(exist_ok=True, parents=True)
@@ -448,6 +442,7 @@ class ModelTrainer(Pluggable):
         else:
             self.optimizer = optimizer(params=self.model.parameters(), **kwargs)
 
+        self.model, self.optimizer = self.fabric.setup(self.model, self.optimizer)
         # initialize sampler if provided
         if sampler is not None:
             # init with default values if only class is provided
@@ -533,6 +528,8 @@ class ModelTrainer(Pluggable):
                     shuffle=shuffle_data_this_epoch,
                     sampler=sampler,
                 )
+
+                batch_loader = self.fabric.setup_dataloaders(batch_loader)
 
                 self.model.train()
 
