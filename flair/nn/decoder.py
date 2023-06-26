@@ -83,6 +83,8 @@ class PrototypicalDecoder(torch.nn.Module):
         else:
             raise KeyError(f"Distance function {distance_function} not found.")
 
+        # all parameters will be pushed internally to the specified device
+        self.to(flair.device)
 
     @property
     def num_prototypes(self):
@@ -150,6 +152,7 @@ class LabelVerbalizerDecoder(torch.nn.Module):
         super().__init__()
         self.label_embedding = label_embedding
         self.verbalized_labels: List[Sentence] = self.verbalize_labels(label_dictionary)
+        self.to(flair.device)
 
     @staticmethod
     def verbalize_labels(label_dictionary: Dictionary) -> List[Sentence]:

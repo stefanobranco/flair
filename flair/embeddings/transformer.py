@@ -514,16 +514,16 @@ class TransformerBaseEmbeddings(Embeddings[Sentence]):
             **tokenizer_kwargs,
         )
 
-        input_ids = batch_encoding["input_ids"]
+        input_ids = batch_encoding["input_ids"].to(device, non_blocking=True)
         model_kwargs = {"input_ids": input_ids}
 
         # Models such as FNet do not have an attention_mask
         if "attention_mask" in batch_encoding:
-            model_kwargs["attention_mask"] = batch_encoding["attention_mask"]
+            model_kwargs["attention_mask"] = batch_encoding["attention_mask"].to(device, non_blocking=True)
 
         if "overflow_to_sample_mapping" in batch_encoding:
             cpu_overflow_to_sample_mapping = batch_encoding["overflow_to_sample_mapping"]
-            model_kwargs["overflow_to_sample_mapping"] = cpu_overflow_to_sample_mapping
+            model_kwargs["overflow_to_sample_mapping"] = cpu_overflow_to_sample_mapping.to(device, non_blocking=True)
             unpacked_ids = combine_strided_tensors(
                 input_ids,
                 model_kwargs["overflow_to_sample_mapping"],
@@ -561,7 +561,7 @@ class TransformerBaseEmbeddings(Embeddings[Sentence]):
                     sentence_idx += part_length
 
         if "bbox" in batch_encoding:
-            model_kwargs["bbox"] = batch_encoding["bbox"]
+            model_kwargs["bbox"] = batch_encoding["bbox"].to(device, non_blocking=True)
 
         if self.token_embedding or self.needs_manual_ocr:
             model_kwargs["token_lengths"] = torch.tensor(sentence_lengths, device=device)
@@ -611,7 +611,7 @@ class TransformerBaseEmbeddings(Embeddings[Sentence]):
             if cpu_overflow_to_sample_mapping is not None:
                 batched_image_encodings = [image_encodings[i] for i in cpu_overflow_to_sample_mapping]
                 image_encodings = torch.stack(batched_image_encodings)
-            image_encodings = image_encodings
+            image_encodings = image_encodings.to(flair.device)
             if isinstance(self.feature_extractor, LayoutLMv2FeatureExtractor):
                 model_kwargs["image"] = image_encodings
             else:
@@ -860,6 +860,7 @@ class TransformerJitEmbeddings(TransformerBaseEmbeddings):
             self.jit_model = jit_model
         self.param_names = param_names
 
+        self.to(flair.device)
         self.eval()
 
     def to_params(self):
@@ -1019,7 +1020,7 @@ class TransformerEmbeddings(TransformerBaseEmbeddings):
                 transformer_model = T5EncoderModel(saved_config, **kwargs)
             else:
                 transformer_model = AutoModel.from_config(saved_config, **kwargs)
-        transformer_model = transformer_model
+        transformer_model = transformer_model.to(flair.device)
 
         self.truncate = True
         self.force_max_length = force_max_length
@@ -1093,6 +1094,7 @@ class TransformerEmbeddings(TransformerBaseEmbeddings):
 
         self.model = transformer_model
 
+        self.to(flair.device)
         # when initializing, embeddings are in eval mode by default
         self.eval()
 

@@ -278,7 +278,7 @@ class DataPoint:
         # if one embedding name, directly return it
         if names and len(names) == 1:
             if names[0] in self._embeddings:
-                return self._embeddings[names[0]]
+                return self._embeddings[names[0]].to(flair.device)
             else:
                 return torch.tensor([], device=flair.device)
 
@@ -294,7 +294,7 @@ class DataPoint:
         for embed_name in sorted(self._embeddings.keys()):
             if embedding_names and embed_name not in embedding_names:
                 continue
-            embed = self._embeddings[embed_name]
+            embed = self._embeddings[embed_name].to(flair.device)
             embeddings.append(embed)
         return embeddings
 

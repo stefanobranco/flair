@@ -390,12 +390,11 @@ class ModelTrainer(Pluggable):
 
         # plugin for checkpointing
         if save_model_each_k_epochs > 0:
-            if self.fabric.is_global_zero:
-                CheckpointPlugin(
-                    save_model_each_k_epochs=save_model_each_k_epochs,
-                    save_optimizer_state=save_optimizer_state,
-                    base_path=base_path,
-                ).attach_to(self)
+            CheckpointPlugin(
+                save_model_each_k_epochs=save_model_each_k_epochs,
+                save_optimizer_state=save_optimizer_state,
+                base_path=base_path,
+            ).attach_to(self)
 
         # === END BLOCK: ACTIVATE PLUGINS === #
 
